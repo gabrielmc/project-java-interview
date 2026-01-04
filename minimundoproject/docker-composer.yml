@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # ===================================
+  # PostgreSQL Database
+  # ===================================
+  postgres:
+    image: postgres:13-alpine
+    container_name: minimundo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: minimundo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - minimundo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===================================
+  # Mini Mundo Application
+  # ===================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: minimundo-app
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: minimundo
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: minimundo-production-secret-key-change-me
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - minimundo-network
+
+  # ===================================
+  # PgAdmin (Opcional - Dev only)
+  # ===================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: minimundo-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@minimundo.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - minimundo-network
+    profiles:
+      - dev
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  minimundo-network:
+    driver: bridge
