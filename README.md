@@ -386,8 +386,7 @@ Este projeto está sob a licença MIT.
 
 Desenvolvido por **[Seu Nome]**
 
-- GitHub: [@seu-usuario](https://github.com/seu-usuario)
-- LinkedIn: [Seu Nome](https://linkedin.com/in/seu-perfil)
+- GitHub: [@gabrielmc](https://github.com/gabrielmc)
 
 ---
 
