@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>MiniMundo - Gerenciar Tarefas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</h:head>
+
+<h:body>
+    <f:metadata>
+        <f:viewParam name="projetoId" value="#{tarefaBean.projetoId}"/>
+        <f:event type="preRenderView" listener="#{tarefaBean.init}"/>
+    </f:metadata>
+    
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>✅ MiniMundo - Tarefas</h1>
+        <div class="user-info">
+            <p:button outcome="home" value="Dashboard" icon="pi pi-home"/>
+            <p:button outcome="projetos" value="Projetos" icon="pi pi-folder"/>
+            <span>#{tarefaBean.nomeUsuario}</span>
+            <p:commandButton value="Sair" 
+                             action="#{tarefaBean.logout}"
+                             icon="pi pi-sign-out"
+                             styleClass="ui-button-danger"/>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h:form id="form">
+            <p:messages id="messages" showDetail="true" closable="true"/>
+            
+            <!-- Projeto Info -->
+            <p:panel header="Projeto: #{tarefaBean.projetoNome}" style="margin-bottom: 20px;">
+                <p:panelGrid columns="4" layout="grid">
+                    <h:outputText value="Total de Tarefas: #{tarefaBean.totalTarefas}"/>
+                    <h:outputText value="Concluídas: #{tarefaBean.tarefasConcluidas}"/>
+                    <h:outputText value="Pendentes: #{tarefaBean.tarefasPendentes}"/>
+                    <h:outputText value="Progresso: #{tarefaBean.progresso}%"/>
+                </p:panelGrid>
+            </p:panel>
+            
+            <!-- Toolbar -->
+            <p:toolbar style="margin-bottom: 20px;">
+                <p:toolbarGroup>
+                    <p:commandButton value="Nova Tarefa" 
+                                     icon="pi pi-plus"
+                                     action="#{tarefaBean.prepareNew}"
+                                     update="form"
+                                     styleClass="ui-button-success"/>
+                    
+                    <p:commandButton value="Atualizar" 
+                                     icon="pi pi-refresh"
+                                     action="#{tarefaBean.loadTarefas}"
+                                     update="form"/>
+                </p:toolbarGroup>
+                
+                <p:toolbarGroup align="right">
+                    <p:selectOneMenu value="#{tarefaBean.filtroStatus}" 
+                                     style="margin-right: 10px;">
+                        <f:selectItem itemLabel="Todos os Status" itemValue="#{null}"/>
+                        <f:selectItem itemLabel="Concluída" itemValue="CONCLUIDA"/>
+                        <f:selectItem itemLabel="Não Concluída" itemValue="NAO_CONCLUIDA"/>
+                    </p:selectOneMenu>
+                    
+                    <p:inputText placeholder="Buscar descrição..." 
+                                 value="#{tarefaBean.filtroDescricao}"
+                                 style="margin-right: 10px;"/>
+                    
+                    <p:commandButton value="Filtrar" 
+                                     icon="pi pi-search"
+                                     action="#{tarefaBean.filtrar}"
+                                     update="form"/>
+                </p:toolbarGroup>
+            </p:toolbar>
+            
+            <!-- DataTable -->
+            <p:dataTable id="table"
+                         value="#{tarefaBean.tarefas}" 
+                         var="tarefa"
+                         emptyMessage="Nenhuma tarefa encontrada"
+                         paginator="true" 
+                         rows="10">
+                
+                <p:column headerText="ID" style="width: 60px;">
+                    <h:outputText value="#{tarefa.id}"/>
+                </p:column>
+                
+                <p:column headerText="Descrição">
+                    <h:outputText value="#{tarefa.descricao}"/>
+                </p:column>
+                
+                <p:column headerText="Data Início" style="width: 120px;">
+                    <h:outputText value="#{tarefa.dataInicio}">
+                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                
+                <p:column headerText="Data Fim" style="width: 120px;">
+                    <h:outputText value="#{tarefa.dataFim}">
+                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                
+                <p:column headerText="Predecessora" style="width: 150px;">
+                    <h:outputText value="#{tarefa.tarefaPredecessoraDescricao}" 
+                                  rendered="#{tarefa.tarefaPredecessoraId != null}"/>
+                    <h:outputText value="-" 
+                                  rendered="#{tarefa.tarefaPredecessoraId == null}"/>
+                </p:column>
+                
+                <p:column headerText="Status" style="width: 130px; text-align: center">
+                    <p:tag value="#{tarefa.status == 'CONCLUIDA' ? 'Concluída' : 'Pendente'}" 
+                           severity="#{tarefa.status == 'CONCLUIDA' ? 'success' : 'warning'}"/>
+                </p:column>
+                
+                <p:column headerText="Ações" style="width: 180px; text-align: center">
+                    <p:commandButton icon="pi pi-check" 
+                                     title="Marcar como concluída"
+                                     action="#{tarefaBean.marcarConcluida(tarefa.id)}"
+                                     update="form"
+                                     styleClass="ui-button-success ui-button-sm"
+                                     style="margin-right: 5px;"
+                                     rendered="#{tarefa.status != 'CONCLUIDA'}"/>
+                    
+                    <p:commandButton icon="pi pi-pencil" 
+                                     title="Editar"
+                                     action="#{tarefaBean.prepareEdit(tarefa)}"
+                                     update="form"
+                                     styleClass="ui-button-warning ui-button-sm"
+                                     style="margin-right: 5px;"/>
+                    
+                    <p:commandButton icon="pi pi-trash" 
+                                     title="Excluir"
+                                     action="#{tarefaBean.delete(tarefa.id)}"
+                                     update="form"
+                                     styleClass="ui-button-danger ui-button-sm">
+                        <p:confirm header="Confirmação" 
+                                   message="Deseja realmente excluir esta tarefa?" 
+                                   icon="pi pi-exclamation-triangle"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+            
+            <!-- Dialog de Cadastro/Edição -->
+            <p:dialog header="#{tarefaBean.tarefa.id == null ? 'Nova Tarefa' : 'Editar Tarefa'}"
+                      widgetVar="dlgTarefa"
+                      visible="#{tarefaBean.showDialog}"
+                      modal="true"
+                      width="600">
+                
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-fluid">
+                    <p:outputLabel for="descricao" value="Descrição:*"/>
+                    <p:inputTextarea id="descricao" 
+                                     value="#{tarefaBean.tarefa.descricao}"
+                                     rows="3"
+                                     required="true"
+                                     requiredMessage="Descrição é obrigatória"/>
+                    
+                    <p:outputLabel for="dataInicio" value="Data Início:"/>
+                    <p:calendar id="dataInicio" 
+                                value="#{tarefaBean.tarefa.dataInicio}"
+                                pattern="dd/MM/yyyy"
+                                mask="true"
+                                showIcon="true"/>
+                    
+                    <p:outputLabel for="dataFim" value="Data Fim:"/>
+                    <p:calendar id="dataFim" 
+                                value="#{tarefaBean.tarefa.dataFim}"
+                                pattern="dd/MM/yyyy"
+                                mask="true"
+                                showIcon="true"/>
+                    
+                    <p:outputLabel for="predecessora" value="Tarefa Predecessora:"/>
+                    <p:selectOneMenu id="predecessora" 
+                                     value="#{tarefaBean.tarefa.tarefaPredecessoraId}">
+                        <f:selectItem itemLabel="Nenhuma" itemValue="#{null}"/>
+                        <f:selectItems value="#{tarefaBean.tarefasDisponiveis}" 
+                                       var="t"
+                                       itemLabel="#{t.descricao}"
+                                       itemValue="#{t.id}"/>
+                    </p:selectOneMenu>
+                    
+                    <p:outputLabel for="status" value="Status:*"/>
+                    <p:selectOneMenu id="status" value="#{tarefaBean.tarefa.status}">
+                        <f:selectItem itemLabel="Não Concluída" itemValue="NAO_CONCLUIDA"/>
+                        <f:selectItem itemLabel="Concluída" itemValue="CONCLUIDA"/>
+                    </p:selectOneMenu>
+                </p:panelGrid>
+                
+                <f:facet name="footer">
+                    <p:commandButton value="Salvar" 
+                                     icon="pi pi-check"
+                                     action="#{tarefaBean.save}"
+                                     update="form"
+                                     styleClass="ui-button-success"/>
+                    
+                    <p:commandButton value="Cancelar" 
+                                     icon="pi pi-times"
+                                     action="#{tarefaBean.cancel}"
+                                     update="form"
+                                     styleClass="ui-button-secondary"/>
+                </f:facet>
+            </p:dialog>
+            
+            <!-- Confirm Dialog -->
+            <p:confirmDialog global="true">
+                <p:commandButton value="Sim" 
+                                 type="button" 
+                                 styleClass="ui-confirmdialog-yes ui-button-success"/>
+                <p:commandButton value="Não" 
+                                 type="button" 
+                                 styleClass="ui-confirmdialog-no ui-button-danger"/>
+            </p:confirmDialog>
+        </h:form>
+    </div>
+    
+    <style>
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .navbar h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        body {
+            background: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    </style>
+</h:body>
+</html>

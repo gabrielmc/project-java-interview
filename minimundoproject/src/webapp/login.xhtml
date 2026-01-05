@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>MiniMundo - Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header h1 {
+            color: #667eea;
+            margin: 0 0 10px 0;
+            font-size: 32px;
+        }
+        
+        .login-header p {
+            color: #666;
+            margin: 0;
+        }
+        
+        .form-field {
+            margin-bottom: 20px;
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>🚀 MiniMundo</h1>
+            <p>Faça login para continuar</p>
+        </div>
+        
+        <h:form id="loginForm">
+            <p:messages id="messages" showDetail="true" closable="true"/>
+            
+            <div class="form-field">
+                <p:outputLabel for="email" value="Email:"/>
+                <p:inputText id="email" 
+                             value="#{loginBean.email}" 
+                             required="true"
+                             requiredMessage="Email é obrigatório"
+                             validatorMessage="Email inválido"
+                             style="width: 100%">
+                    <f:validateRegex pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"/>
+                </p:inputText>
+            </div>
+            
+            <div class="form-field">
+                <p:outputLabel for="senha" value="Senha:"/>
+                <p:password id="senha" 
+                            value="#{loginBean.senha}" 
+                            required="true"
+                            requiredMessage="Senha é obrigatória"
+                            feedback="false"
+                            style="width: 100%"/>
+            </div>
+            
+            <p:commandButton value="Entrar" 
+                             action="#{loginBean.login}"
+                             update="messages"
+                             styleClass="ui-button-success"
+                             style="width: 100%; margin-top: 10px"
+                             icon="pi pi-sign-in"/>
+            
+            <div class="register-link">
+                Não tem conta? 
+                <h:link outcome="register" value="Cadastre-se aqui"/>
+            </div>
+        </h:form>
+    </div>
+</h:body>
+</html>
