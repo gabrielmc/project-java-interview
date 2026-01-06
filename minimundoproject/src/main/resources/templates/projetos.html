@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MiniMundo - Projetos</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <style>
+        body { background: #f5f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar h1 { font-size: 24px; }
+        .user-info { display: flex; gap: 15px; align-items: center; }
+        .btn { padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 5px; border: 1px solid rgba(255,255,255,0.3); }
+        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
+        .alert { padding: 12px; border-radius: 5px; margin-bottom: 20px; }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+        .toolbar { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-primary { padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-danger { background: #dc3545; }
+        .btn-warning { background: #ffc107; color: #000; }
+        table { width: 100%; background: white; border-radius: 10px; overflow: hidden; border-collapse: collapse; }
+        table th, table td { padding: 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        table th { background: #f8f9fa; font-weight: 600; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 600px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1> MiniMundo - Projetos</h1>
+        <div class="user-info">
+            <a th:href="@{/home}" class="btn">Dashboard</a>
+            <span th:text="${usuarioNome}"></span>
+            <a th:href="@{/logout}" class="btn">Sair</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+        
+        <div class="toolbar">
+            <button class="btn-primary" onclick="document.getElementById('modalNovo').classList.add('active')">+ Novo Projeto</button>
+            <form th:action="@{/projetos}" method="get" style="display: flex; gap: 10px;">
+                <input type="text" name="nome" placeholder="Buscar por nome..." style="padding: 8px;">
+                <button type="submit" class="btn-primary">Buscar</button>
+            </form>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Status</th>
+                    <th>Orçamento</th>
+                    <th>Tarefas</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="projeto : ${projetos}">
+                    <td th:text="${projeto.id}"></td>
+                    <td th:text="${projeto.nome}"></td>
+                    <td th:text="${projeto.descricao}"></td>
+                    <td th:text="${projeto.status}"></td>
+                    <td th:text="'R$ ' + ${projeto.orcamentoDisponivel}"></td>
+                    <td th:text="${projeto.tarefasConcluidas} + '/' + ${projeto.totalTarefas}"></td>
+                    <td>
+                        <a th:href="@{/tarefas(projetoId=${projeto.id})}" class="btn-primary" style="font-size: 12px; padding: 5px 10px;">Tarefas</a>
+                        <a th:href="@{/projetos/deletar/{id}(id=${projeto.id})}" class="btn-danger" style="font-size: 12px; padding: 5px 10px;" onclick="return confirm('Deseja excluir?')">Excluir</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Modal Novo Projeto -->
+    <div id="modalNovo" class="modal">
+        <div class="modal-content">
+            <h2>Novo Projeto</h2>
+            <form th:action="@{/projetos/criar}" th:object="${projetoRequest}" method="post">
+                <div class="form-group">
+                    <label>Nome:</label>
+                    <input type="text" th:field="*{nome}" required>
+                </div>
+                <div class="form-group">
+                    <label>Descrição:</label>
+                    <textarea th:field="*{descricao}" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Status:</label>
+                    <select th:field="*{status}">
+                        <option value="ATIVO">Ativo</option>
+                        <option value="INATIVO">Inativo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Orçamento:</label>
+                    <input type="number" step="0.01" th:field="*{orcamentoDisponivel}">
+                </div>
+                <button type="submit" class="btn-primary">Salvar</button>
+                <button type="button" class="btn-danger" onclick="document.getElementById('modalNovo').classList.remove('active')">Cancelar</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
