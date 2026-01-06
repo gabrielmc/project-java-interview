@@ -1,78 +1,166 @@
-name: CI/CD - Build and Push Docker Image
+name: CI/CD - Build, Test and Deploy Simulation
 
 on:
   push:
     branches:
       - master
-    tags:
-      - 'v*.*.*'
-      - 'V*.*.*'
-      - '*.*.*'
-      - '*.*.*-hf*'
-      - '*.*.*-HF*'
+  pull_request:
 
 env:
-  DOCKER_IMAGE_NAME: seu-usuario/mini-mundo
-  JAVA_VERSION: '8'
+  APP_NAME: mini-mundo-project
+  JAVA_VERSION: '17'
+  DEPLOY_ENV: staging
 
 jobs:
-  build-and-push:
+  build:
+    name: 🏗️ Build & Test
     runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
 
-      - name: Set up JDK 8
-        uses: actions/setup-java@v3
+    steps:
+      - name: 📥 Checkout source code
+        uses: actions/checkout@v4
+
+      - name: ☕ Set up JDK 17
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
-          distribution: 'temurin'
-          cache: 'maven'
+          distribution: temurin
+          cache: maven
 
-      - name: Extract version from tag
-        id: extract_version
+      - name: 🧪 Run tests
+        run: mvn clean test
+
+      - name: 📦 Package application
+        run: mvn clean package -DskipTests
+
+      - name: 📤 Upload build artifact (JAR)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-jar
+          path: target/*.jar
+
+  quality-gate:
+    name: 🔍 Quality Gate (Simulation)
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: 🔎 Static analysis simulation
         run: |
-          if [[ $GITHUB_REF == refs/tags/* ]]; then
-            VERSION=${GITHUB_REF#refs/tags/}
+          echo "🔍 Running static code analysis..."
+          sleep 2
+          echo "✅ Code quality approved"
+
+      - name: 🛡️ Security scan simulation
+        run: |
+          echo "🛡️ Running dependency vulnerability scan..."
+          sleep 2
+          echo "✅ No critical vulnerabilities found"
+
+  deploy:
+    name: 🚀 Deploy Simulation
+    runs-on: ubuntu-latest
+    needs: quality-gate
+    #environment: ${{ env.DEPLOY_ENV }}
+
+    steps:
+      - name: 📥 Download artifact
+        uses: actions/download-artifact@v4
+        #with:
+          #✅name: ${{ env.APP_NAME }}-jar
+
+      - name: 📋 Pre-deploy checks
+        run: |
+          echo "🔍 Checking environment variables..."
+          echo "🌎 Environment: $DEPLOY_ENV"
+          echo "📦 Artifact present:"
+          ls -la
+
+      - name: 🚀 Deploy application (SIMULATION)
+        run: |
+          echo "🚀 Starting deployment..."
+          sleep 2
+          echo "📦 Uploading artifact to server..."
+          sleep 2
+          echo "🔄 Restarting application service..."
+          sleep 2
+          echo "✅ Deployment completed successfully (simulation)"
+
+      - name: 📊 Post-deploy health check
+        run: |
+          echo "❤️ Running health check..."
+          sleep 2
+          echo "✅ Application is healthy"
+
+      - name: 📝 Deployment summary
+        run: |
+          echo "=============================="
+          echo "🚀 DEPLOY SUMMARY"
+          echo "Application: $APP_NAME"
+          echo "Environment: $DEPLOY_ENV"
+          echo "Status: SUCCESS"
+          echo "=============================="
+
+      # ---------------------------------------------------------
+      # 🚨 REAL DEPLOY (COMMENTED - FOR PRODUCTION USE)
+      # ---------------------------------------------------------
+      #
+      # - name: 🚀 Deploy to production server
+      #   run: |
+      #     scp target/*.jar user@server:/opt/apps/
+      #     ssh user@server "systemctl restart mini-mundo"
+      #
+      # 🔐 Requires:
+      # - SSH keys stored in GitHub Secrets
+      # - Production server configured
+      # - Proper firewall and rollback strategy
+      #
+      # ---------------------------------------------------------
+
+     
+      # - name: Extract version from tag
+      #   id: extract_version
+      #   run: |
+      #     if [[ $GITHUB_REF == refs/tags/* ]]; then
+      #       VERSION=${GITHUB_REF#refs/tags/}
             # Remove 'v' ou 'V' do início se existir
-            VERSION=$(echo $VERSION | sed 's/^[vV]//')
-            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-            echo "IS_TAG=true" >> $GITHUB_OUTPUT
-          else
-            echo "VERSION=latest" >> $GITHUB_OUTPUT
-            echo "IS_TAG=false" >> $GITHUB_OUTPUT
-          fi
+      #       VERSION=$(echo $VERSION | sed 's/^[vV]//')
+      #       echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+      #       echo "IS_TAG=true" >> $GITHUB_OUTPUT
+      #     else
+      #       echo "VERSION=latest" >> $GITHUB_OUTPUT
+      #       echo "IS_TAG=false" >> $GITHUB_OUTPUT
+      #     fi
 
-      - name: Build with Maven
-        run: |
-          mvn clean package -DskipTests
-          echo "Build completed successfully!"
+      # - name: Build with Maven
+      #   run: |
+      #     mvn clean package -DskipTests
+      #     echo "Build completed successfully!"
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v2
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      # - name: Login to Docker Hub
+      #   uses: docker/login-action@v2
+      #   with:
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image
-        if: steps.extract_version.outputs.IS_TAG == 'true'
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ env.DOCKER_IMAGE_NAME }}:${{ steps.extract_version.outputs.VERSION }}
-            ${{ env.DOCKER_IMAGE_NAME }}:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      # - name: Build and push Docker image
+      #   if: steps.extract_version.outputs.IS_TAG == 'true'
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: .
+      #     push: true
+      #     tags: |
+      #       ${{ env.DOCKER_IMAGE_NAME }}:${{ steps.extract_version.outputs.VERSION }}
+      #       ${{ env.DOCKER_IMAGE_NAME }}:latest
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
 
-      - name: Image published
-        if: steps.extract_version.outputs.IS_TAG == 'true'
-        run: |
-          echo "✅ Docker image published successfully!"
-          echo "🐳 Image: ${{ env.DOCKER_IMAGE_NAME }}:${{ steps.extract_version.outputs.VERSION }}"
-          echo "🐳 Image: ${{ env.DOCKER_IMAGE_NAME }}:latest"
+      # - name: Image published
+      #   if: steps.extract_version.outputs.IS_TAG == 'true'
+      #   run: |
+      #     echo "✅ Docker image published successfully!"
+      #     echo "🐳 Image: ${{ env.DOCKER_IMAGE_NAME }}:${{ steps.extract_version.outputs.VERSION }}"
+      #     echo "🐳 Image: ${{ env.DOCKER_IMAGE_NAME }}:latest"
