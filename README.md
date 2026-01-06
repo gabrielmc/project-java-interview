@@ -53,22 +53,20 @@ docker-compose down
 ```
 
 **Acessos:**
-- API: http://localhost:8080/api
+- web: http://localhost:8080/login
 - Banco: localhost:5432
 
 ### **Opção 2: Localmente (Maven)**
 
 ```bash
-# 1. Subir apenas o PostgreSQL
-docker-compose up postgres -d
+# Subir apenas o PostgreSQL [se não estiver rodando localmente]
+# docker-compose up postgres -d
+
+# 1. Rodar a aplicação
+mvnw clear compile
 
 # 2. Rodar a aplicação
-mvn spring-boot:run
-
-# Ou compilar e executar o JAR
-mvn clean package -DskipTests
-java -jar target/minimundo-0.0.1-SNAPSHOT.war
-```
+mvnw spring-boot:run
 
 ---
 
@@ -306,6 +304,13 @@ minimundoproject/
 │       │   │   ├── AuthController.java
 │       │   │   ├── ProjetoController.java
 │       │   │   └── TarefaController.java
+│       │   │   │
+│       │   │   └── view/
+│       │   │       ├── LoginViewController.java 
+│       │   │       ├── RegisterViewController.java 
+│       │   │       ├── HomeViewController.java 
+│       │   │       ├── ProjetoViewController.java 
+│       │   │       └── TarefaViewController.java 
 │       │   ├── dto/
 │       │   │   ├── request/
 │       │   │   │   ├── LoginRequest.java
@@ -341,6 +346,13 @@ minimundoproject/
 │       │       │   └── style.css
 │       │       └── js/
 │       │           └── app.js
+│       │
+│       └── templates/ 
+│       |    ├── login.html 
+│       |    ├── register.html 
+│       |    ├── home.html 
+│       |    ├── projetos.html 
+│       |    └── tarefas.html 
 │       └── webapp/
 │           ├── WEB-INF/
 │           │   ├── web.xml
