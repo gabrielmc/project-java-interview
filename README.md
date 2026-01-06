@@ -8,7 +8,6 @@ Sistema completo de gerenciamento de projetos e tarefas desenvolvido com **Sprin
 - [Instalação](#-instalação)
 - [Rodando o Projeto](#-rodando-o-projeto)
 - [Endpoints da API](#-endpoints-da-api)
-- [Testes com Postman/Insomnia](#-testes-com-postmaninsomnia)
 - [CI/CD](#-cicd)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
 
@@ -224,23 +223,6 @@ Authorization: Bearer {token}
 
 ---
 
-## 🧪 Testes com Postman/Insomnia
-
-### 1. **Cadastre um usuário**
-```
-POST http://localhost:8080/api/auth/register
-```
-
-### 2. **Copie o token JWT da resposta**
-
-### 3. **Configure o Header Authorization**
-```
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9...
-```
-
-### 4. **Teste os outros endpoints!**
-
----
 
 ## 🔄 CI/CD
 
@@ -397,9 +379,13 @@ minimundoproject/
 
 ## 📝 Convenções do Projeto
 
-### **Git Flow:**
+### **Git Flow realizado para a simulação:** (Teste com pseudo fluxo de desenvolvimento)
 - `master` - branch principal (produção)
 - `development` - branch de desenvolvimento
+
+- **Git Flow padrão:**
+- `bugfix/*` - correções de bugs
+- `release/*` - preparação para release
 - `feature/*` - novas funcionalidades
 - `hotfix/*` - correções urgentes
 
