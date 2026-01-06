@@ -247,6 +247,7 @@ Authorization: Bearer eyJhbGciOiJIUzUxMiJ9...
 ## 🔄 CI/CD
 
 O projeto está configurado para **deploy automático** via GitHub Actions.
+obs: Pseudo código para deploy.
 
 ### Setup:
 
@@ -292,33 +293,67 @@ docker run -p 8080:8080 \
 ## 📂 Estrutura do Projeto
 
 ```
-minimundo/
-├── src/main/java/com/minimundo/
-│   ├── MiniMundoApplication.java       # Classe principal
-│   ├── config/                          # Configurações
-│   │   ├── SecurityConfig.java
-│   │   ├── JwtAuthenticationFilter.java
-│   │   └── CorsConfig.java
-│   ├── controller/                      # Controllers REST
-│   │   ├── AuthController.java
-│   │   ├── ProjetoController.java
-│   │   └── TarefaController.java
-│   ├── dto/                             # DTOs
-│   │   ├── request/
-│   │   └── response/
-│   ├── exception/                       # Exceções
-│   ├── model/                           # Entidades JPA
-│   │   ├── Usuario.java
-│   │   ├── Projeto.java
-│   │   └── Tarefa.java
-│   ├── repository/                      # Repositories
-│   ├── service/                         # Services
-│   └── util/                            # Utilitários
-│       └── JwtUtil.java
-├── src/main/resources/
-│   └── application.properties
+minimundoproject/
+├── src/
+│   └── main/
+│       ├── java/com/projecttasks/minimundoproject/
+│       │   ├── MiniMundoProjectApplication.java
+│       │   ├── config/
+│       │   │   ├── SecurityConfig.java
+│       │   │   ├── JwtAuthenticationFilter.java
+│       │   │   └── CorsConfig.java
+│       │   ├── controller/
+│       │   │   ├── AuthController.java
+│       │   │   ├── ProjetoController.java
+│       │   │   └── TarefaController.java
+│       │   ├── dto/
+│       │   │   ├── request/
+│       │   │   │   ├── LoginRequest.java
+│       │   │   │   ├── RegisterRequest.java
+│       │   │   │   ├── ProjetoRequest.java
+│       │   │   │   └── TarefaRequest.java
+│       │   │   └── response/
+│       │   │       ├── AuthResponse.java
+│       │   │       ├── ProjetoResponse.java
+│       │   │       └── TarefaResponse.java
+│       │   ├── exception/
+│       │   │   ├── BusinessException.java
+│       │   │   ├── GlobalExceptionHandler.java
+│       │   │   └── ResourceNotFoundException.java
+│       │   ├── model/
+│       │   │   ├── Usuario.java
+│       │   │   ├── Projeto.java
+│       │   │   └── Tarefa.java
+│       │   ├── repository/
+│       │   │   ├── UsuarioRepository.java
+│       │   │   ├── ProjetoRepository.java
+│       │   │   └── TarefaRepository.java
+│       │   ├── service/
+│       │   │   ├── AuthService.java
+│       │   │   ├── ProjetoService.java
+│       │   │   └── TarefaService.java
+│       │   └── util/
+│       │       └── JwtUtil.java
+│       ├── resources/
+│       │   ├── application.properties
+│       │   └── static/
+│       │       ├── css/
+│       │       │   └── style.css
+│       │       └── js/
+│       │           └── app.js
+│       └── webapp/
+│           ├── WEB-INF/
+│           │   ├── web.xml
+│           │   └── faces-config.xml
+│           ├── login.xhtml
+│           ├── register.xhtml
+│           ├── home.xhtml
+│           ├── projetos.xhtml
+│           └── tarefas.xhtml
 ├── Dockerfile
 ├── docker-compose.yml
+├── .dockerignore
+├── .gitignore
 ├── pom.xml
 └── README.md
 ```
@@ -352,29 +387,12 @@ minimundo/
 
 ### **Git Flow:**
 - `master` - branch principal (produção)
-- `develop` - branch de desenvolvimento
+- `development` - branch de desenvolvimento
 - `feature/*` - novas funcionalidades
 - `hotfix/*` - correções urgentes
 
-### **Commits (Conventional Commits):**
-```bash
-feat: adiciona autenticação JWT
-fix: corrige validação de datas
-docs: atualiza README
-refactor: melhora estrutura de services
-```
-
 ---
 
-## 🤝 Contribuindo
-
-1. Fork o projeto
-2. Crie uma branch: `git checkout -b feature/minha-feature`
-3. Commit: `git commit -m 'feat: minha nova feature'`
-4. Push: `git push origin feature/minha-feature`
-5. Abra um Pull Request
-
----
 
 ## 📄 Licença
 
