@@ -38,8 +38,8 @@ public class SecurityConfig {
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/*.xhtml").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/login", "/", "/*.xhtml").permitAll()
                 .requestMatchers("/javax.faces.resource/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated()
