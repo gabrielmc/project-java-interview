@@ -26,66 +26,84 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/tarefas")
 @RequiredArgsConstructor
 public class TarefaViewController {
-    
+
     private final TarefaService tarefaService;
     private final ProjetoService projetoService;
-    
+
     @GetMapping
     public String tarefas(@RequestParam Long projetoId,
-                         @RequestParam(required = false) Tarefa.StatusTarefa status,
-                         @RequestParam(required = false) String descricao,
-                         HttpSession session, Model model) {
+                          @RequestParam(required = false) Tarefa.StatusTarefa status,
+                          @RequestParam(required = false) String descricao,
+                          HttpSession session,
+                          Model model) {
+
         Long usuarioId = (Long) session.getAttribute("usuarioId");
-        if (usuarioId == null) 
-			return "redirect:/login";
-        
+        if (usuarioId == null)
+            return "redirect:/login";
+
         try {
             ProjetoResponse projeto = projetoService.findById(projetoId, usuarioId);
             List<TarefaResponse> tarefas = tarefaService.findByProjeto(projetoId, usuarioId, status, descricao);
-            
+
+            // ===============================
+            // CÁLCULOS SEM USO DO THYMELEAF - teste
+            // ===============================
+            int totalTarefas = tarefas.size();
+            int tarefasConcluidas = (int) tarefas.stream()
+                    .filter(t -> t.getStatus() == Tarefa.StatusTarefa.CONCLUIDA)
+                    .count();
+            int tarefasPendentes = totalTarefas - tarefasConcluidas;
+
             model.addAttribute("projeto", projeto);
             model.addAttribute("tarefas", tarefas);
+            model.addAttribute("totalTarefas", totalTarefas);
+            model.addAttribute("tarefasConcluidas", tarefasConcluidas);
+            model.addAttribute("tarefasPendentes", tarefasPendentes);
             model.addAttribute("usuarioNome", session.getAttribute("usuarioNome"));
             model.addAttribute("tarefaRequest", new TarefaRequest());
+
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
         }
-        
+
         return "tarefas";
     }
-    
+
     @PostMapping("/criar")
     public String criar(@ModelAttribute TarefaRequest request,
-                       HttpSession session,
-                       RedirectAttributes redirectAttributes) {
+                        HttpSession session,
+                        RedirectAttributes redirectAttributes) {
+
         Long usuarioId = (Long) session.getAttribute("usuarioId");
-        if (usuarioId == null) 
-			return "redirect:/login";
-        
+        if (usuarioId == null)
+            return "redirect:/login";
         try {
             tarefaService.create(request, usuarioId);
-            redirectAttributes.addFlashAttribute("success", "Tarefa criada com sucesso!");
+            redirectAttributes.addFlashAttribute(
+                    "success", "Tarefa criada com sucesso!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute(
+                    "error", e.getMessage());
         }
-        
         return "redirect:/tarefas?projetoId=" + request.getProjetoId();
     }
-    
+
     @GetMapping("/deletar/{id}")
     public String deletar(@PathVariable Long id,
-                         @RequestParam Long projetoId,
-                         HttpSession session,
-                         RedirectAttributes redirectAttributes) {
+                          @RequestParam Long projetoId,
+                          HttpSession session,
+                          RedirectAttributes redirectAttributes) {
+
         Long usuarioId = (Long) session.getAttribute("usuarioId");
-        if (usuarioId == null) 
-			return "redirect:/login";
-        
+        if (usuarioId == null)
+            return "redirect:/login";
         try {
             tarefaService.delete(id, usuarioId);
-            redirectAttributes.addFlashAttribute("success", "Tarefa excluída com sucesso!");
+            redirectAttributes.addFlashAttribute(
+                    "success", "Tarefa excluída com sucesso!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute(
+                    "error", e.getMessage());
         }
         return "redirect:/tarefas?projetoId=" + projetoId;
     }

@@ -14,17 +14,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    
+
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
-    
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
             .cors(cors -> cors.configurationSource(request -> {
                 var corsConfig = new org.springframework.web.cors.CorsConfiguration();
@@ -35,17 +36,34 @@ public class SecurityConfig {
                 return corsConfig;
             }))
             .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // MVC + Sessão (login via tela)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/login", "/", "/*.xhtml").permitAll()
-                .requestMatchers("/javax.faces.resource/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
+                // ROTAS PÚBLICAS (VIEW)
+                .requestMatchers(
+                    "/",
+                    "/login",
+                    "/register",
+                    "/css/**",
+                    "/js/**",
+                    "/images/**"
+                ).permitAll()
+                // TELAS MVC (controle por HttpSession)
+                .requestMatchers(
+                    "/home",
+                    "/projetos/**",
+                    "/tarefas/**"
+                ).permitAll()
+                .requestMatchers("/api/auth/**").permitAll()                            // API pública
+                .requestMatchers("/*.xhtml", "/javax.faces.resource/**").permitAll()    // JSF / recursos
+                .requestMatchers("/h2-console/**").permitAll()                          // H2 Console
                 .anyRequest().authenticated()
             )
+            // JWT
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        
+
+        // necessário para H2 Console
+        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
         return http.build();
     }
 }
