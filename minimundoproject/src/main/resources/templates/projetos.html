@@ -6,7 +6,7 @@
     <link th:href="@{/css/style.css}" rel="stylesheet">
     <style>
         body { background: #f5f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar { background: linear-gradient(135deg, #031681ff 0%, #8293f7ff 100%); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
         .navbar h1 { font-size: 24px; }
         .user-info { display: flex; gap: 15px; align-items: center; }
         .btn { padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 5px; border: 1px solid rgba(255,255,255,0.3); }
@@ -15,7 +15,7 @@
         .alert-success { background: #d4edda; color: #155724; }
         .alert-error { background: #f8d7da; color: #721c24; }
         .toolbar { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-primary { padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-primary { padding: 10px 20px; background: #031681ff; color: white; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; font-weight: 600; }
         .btn-danger { background: #dc3545; }
         .btn-warning { background: #ffc107; color: #000; }
         table { width: 100%; background: white; border-radius: 10px; overflow: hidden; border-collapse: collapse; }
@@ -70,7 +70,7 @@
                     <td th:text="${projeto.descricao}"></td>
                     <td th:text="${projeto.status}"></td>
                     <td th:text="'R$ ' + ${projeto.orcamentoDisponivel}"></td>
-                    <td th:text="${projeto.tarefasConcluidas} + '/' + ${projeto.totalTarefas}"></td>
+                    <td th:text="|${projeto.tarefasConcluidas}/${projeto.totalTarefas}|"></td>
                     <td>
                         <a th:href="@{/tarefas(projetoId=${projeto.id})}" class="btn-primary" style="font-size: 12px; padding: 5px 10px;">Tarefas</a>
                         <a th:href="@{/projetos/deletar/{id}(id=${projeto.id})}" class="btn-danger" style="font-size: 12px; padding: 5px 10px;" onclick="return confirm('Deseja excluir?')">Excluir</a>

@@ -5,7 +5,7 @@
     <title>MiniMundo - Tarefas</title>
     <style>
         body { background: #f5f7fa; font-family: 'Segoe UI', sans-serif; margin: 0; }
-        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar { background: linear-gradient(135deg, #031681ff 0%, #8293f7ff 100%); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
         .navbar h1 { font-size: 24px; margin: 0; }
         .user-info { display: flex; gap: 15px; align-items: center; }
         .btn { padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 5px; }
@@ -14,9 +14,8 @@
         .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px; }
         .stat-item { background: #f8f9fa; padding: 15px; border-radius: 5px; text-align: center; }
         .toolbar { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-        .btn-primary { padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-primary { padding: 10px 20px; background: #031681ff; color: white; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; font-weight: 600; }
         .btn-danger { background: #dc3545; }
-        .btn-success { background: #28a745; }
         table { width: 100%; background: white; border-radius: 10px; border-collapse: collapse; }
         table th, table td { padding: 15px; text-align: left; border-bottom: 1px solid #ddd; }
         table th { background: #f8f9fa; font-weight: 600; }
@@ -29,100 +28,119 @@
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <h1>MiniMundo - Tarefas</h1>
-        <div class="user-info">
-            <a th:href="@{/home}" class="btn">Dashboard</a>
-            <a th:href="@{/projetos}" class="btn">Projetos</a>
-            <span th:text="${usuarioNome}"></span>
-            <a th:href="@{/logout}" class="btn">Sair</a>
-        </div>
+
+<div class="navbar">
+    <h1>MiniMundo - Tarefas</h1>
+    <div class="user-info">
+        <a th:href="@{/home}" class="btn">Dashboard</a>
+        <a th:href="@{/projetos}" class="btn">Projetos</a>
+        <span th:text="${usuarioNome}"></span>
+        <a th:href="@{/logout}" class="btn">Sair</a>
     </div>
-    
-    <div class="container">
-        <div class="project-info">
-            <h2>Projeto: <span th:text="${projeto.nome}"></span></h2>
-            <div class="stats">
-                <div class="stat-item">
-                    <strong>Total de Tarefas</strong>
-                    <div th:text="${projeto.totalTarefas}"></div>
-                </div>
-                <div class="stat-item">
-                    <strong>Concluídas</strong>
-                    <div th:text="${projeto.tarefasConcluidas}"></div>
-                </div>
-                <div class="stat-item">
-                    <strong>Pendentes</strong>
-                    <div th:text="${projeto.totalTarefas - projeto.tarefasConcluidas}"></div>
-                </div>
-                <div class="stat-item">
-                    <strong>Status</strong>
-                    <div th:text="${projeto.status}"></div>
-                </div>
+</div>
+
+<div class="container">
+
+    <div class="project-info">
+        <h2>Projeto: <span th:text="${projeto.nome}"></span></h2>
+        <div class="stats">
+            <div class="stat-item">
+                <strong>Total de Tarefas</strong>
+                <div th:text="${projeto.totalTarefas}"></div>
+            </div>
+            <div class="stat-item">
+                <strong>Concluídas</strong>
+                <div th:text="${projeto.tarefasConcluidas}"></div>
+            </div>
+            <div class="stat-item">
+                <strong>Pendentes</strong>
+                <div th:text="${projeto.totalTarefas} - ${projeto.tarefasConcluidas}"></div>
+            </div>
+            <div class="stat-item">
+                <strong>Status</strong>
+                <div th:text="${projeto.status}"></div>
             </div>
         </div>
-        
-        <div class="toolbar">
-            <button class="btn-primary" onclick="document.getElementById('modalNova').classList.add('active')">+ Nova Tarefa</button>
-        </div>
-        
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Descrição</th>
-                    <th>Data Início</th>
-                    <th>Data Fim</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="tarefa : ${tarefas}">
-                    <td th:text="${tarefa.id}"></td>
-                    <td th:text="${tarefa.descricao}"></td>
-                    <td th:text="${tarefa.dataInicio}"></td>
-                    <td th:text="${tarefa.dataFim}"></td>
-                    <td th:text="${tarefa.status}"></td>
-                    <td>
-                        <a th:href="@{/tarefas/deletar/{id}(id=${tarefa.id}, projetoId=${projeto.id})}" 
-                           class="btn-danger" style="font-size: 12px; padding: 5px 10px;"
-                           onclick="return confirm('Deseja excluir?')">Excluir</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
     </div>
-    
-    <!-- Modal Nova Tarefa -->
-    <div id="modalNova" class="modal">
-        <div class="modal-content">
-            <h2>Nova Tarefa</h2>
-            <form th:action="@{/tarefas/criar}" th:object="${tarefaRequest}" method="post">
-                <input type="hidden" th:field="*{projetoId}" th:value="${projeto.id}">
-                <div class="form-group">
-                    <label>Descrição:</label>
-                    <textarea th:field="*{descricao}" rows="3" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Data Início:</label>
-                    <input type="date" th:field="*{dataInicio}">
-                </div>
-                <div class="form-group">
-                    <label>Data Fim:</label>
-                    <input type="date" th:field="*{dataFim}">
-                </div>
-                <div class="form-group">
-                    <label>Status:</label>
-                    <select th:field="*{status}">
-                        <option value="NAO_CONCLUIDA">Não Concluída</option>
-                        <option value="CONCLUIDA">Concluída</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-primary">Salvar</button>
-                <button type="button" class="btn-danger" onclick="document.getElementById('modalNova').classList.remove('active')">Cancelar</button>
-            </form>
-        </div>
+
+    <div class="toolbar">
+        <button class="btn-primary" onclick="document.getElementById('modalNova').classList.add('active')">
+            + Nova Tarefa
+        </button>
     </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Descrição</th>
+            <th>Data Início</th>
+            <th>Data Fim</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="tarefa : ${tarefas}">
+            <td th:text="${tarefa.id}"></td>
+            <td th:text="${tarefa.descricao}"></td>
+            <td th:text="${tarefa.dataInicio}"></td>
+            <td th:text="${tarefa.dataFim}"></td>
+            <td th:text="${tarefa.status}"></td>
+            <td>
+                <a th:href="@{/tarefas/deletar/{id}(id=${tarefa.id}, projetoId=${projeto.id})}"
+                   class="btn-danger"
+                   style="font-size:12px;padding:5px 10px"
+                   onclick="return confirm('Deseja excluir?')">
+                    Excluir
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<!-- MODAL -->
+<div id="modalNova" class="modal">
+    <div class="modal-content">
+        <h2>Nova Tarefa</h2>
+        <form th:action="@{/tarefas/criar}" th:object="${tarefaRequest}" method="post">
+            <input type="hidden" th:field="*{projetoId}" th:value="${projeto.id}" />
+
+            <div class="form-group">
+                <label>Descrição</label>
+                <textarea th:field="*{descricao}" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Data Início</label>
+                <input type="date" th:field="*{dataInicio}" />
+            </div>
+
+            <div class="form-group">
+                <label>Data Fim</label>
+                <input type="date" th:field="*{dataFim}" />
+            </div>
+
+            <div class="form-group">
+                <label>Status</label>
+                <select th:field="*{status}">
+                    <option th:each="s : ${T(com.projectasks.minimundoproject.model.Tarefa.StatusTarefa).values()}"
+                            th:value="${s}"
+                            th:text="${s}">
+                    </option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-primary">Salvar</button>
+            <button type="button" class="btn-danger"
+                    onclick="document.getElementById('modalNova').classList.remove('active')">
+                Cancelar
+            </button>
+        </form>
+    </div>
+</div>
+
 </body>
 </html>
