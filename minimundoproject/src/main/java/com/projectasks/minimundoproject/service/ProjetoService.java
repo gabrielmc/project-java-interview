@@ -32,6 +32,8 @@ public class ProjetoService {
      */
     @Transactional
     public ProjetoResponse create(ProjetoRequest request, Long usuarioId) {
+        if (usuarioId == null)
+            throw new IllegalArgumentException("ID do usuário não pode ser nulo");
         log.info("Criando projeto para usuário ID {}", usuarioId);
         Usuario usuario = usuarioRepository.findById(usuarioId)
             .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
@@ -83,8 +85,9 @@ public class ProjetoService {
      */
     @Transactional(readOnly = true)
     public ProjetoResponse findById(Long id, Long usuarioId) {
+        if (id == null)
+            throw new IllegalArgumentException("IDs do usuário não podem ser nulos");
         log.info("Buscando projeto ID {}", id);
-
         Projeto projeto = projetoRepository.findById(id)
 			.orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
 
@@ -100,8 +103,9 @@ public class ProjetoService {
      */
     @Transactional
     public ProjetoResponse update(Long id, ProjetoRequest request, Long usuarioId) {
+        if (id == null)
+            throw new IllegalArgumentException("IDs do usuário não podem ser nulos");
         log.info("Atualizando projeto ID {}", id);
-
         Projeto projeto = projetoRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
 
@@ -134,8 +138,9 @@ public class ProjetoService {
      */
     @Transactional
     public void delete(Long id, Long usuarioId) {
+        if (id == null)
+            throw new IllegalArgumentException("IDs do usuário não podem ser nulos");
         log.info("Excluindo projeto ID {}", id);
-
         Projeto projeto = projetoRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
 

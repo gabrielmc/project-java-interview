@@ -30,8 +30,6 @@ public class TarefaService {
     @Transactional
     public TarefaResponse create(TarefaRequest request, Long usuarioId) {
         log.info("Criando nova tarefa para projeto ID: {}", request.getProjetoId());
-        
-        // Valida se o projeto existe e pertence ao usuário
         Projeto projeto = projetoRepository.findById(request.getProjetoId())
             .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
         
@@ -78,8 +76,9 @@ public class TarefaService {
      */
     @Transactional(readOnly = true)
     public List<TarefaResponse> findByProjeto(Long projetoId, Long usuarioId, StatusTarefa status, String descricao) {
+        if (projetoId == null)
+            throw new IllegalArgumentException("ID do projeto não podem ser nulos");
         log.info("Listando tarefas do projeto ID: {}", projetoId);
-        
         // Valida se o projeto existe e pertence ao usuário
         Projeto projeto = projetoRepository.findById(projetoId)
             .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
@@ -108,8 +107,9 @@ public class TarefaService {
      */
     @Transactional(readOnly = true)
     public TarefaResponse findById(Long id, Long usuarioId) {
+        if (id == null)
+            throw new IllegalArgumentException("ID do usuário não podem ser nulos");
         log.info("Buscando tarefa ID: {}", id);
-        
         Tarefa tarefa = tarefaRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
         
@@ -126,8 +126,9 @@ public class TarefaService {
      */
     @Transactional
     public TarefaResponse update(Long id, TarefaRequest request, Long usuarioId) {
+        if (id == null)
+            throw new IllegalArgumentException("ID do usuário não podem ser nulos");
         log.info("Atualizando tarefa ID: {}", id);
-        
         Tarefa tarefa = tarefaRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
         
@@ -180,8 +181,9 @@ public class TarefaService {
      */
     @Transactional
     public void delete(Long id, Long usuarioId) {
+        if (id == null)
+            throw new IllegalArgumentException("ID do usuário não podem ser nulos");
         log.info("Excluindo tarefa ID: {}", id);
-        
         Tarefa tarefa = tarefaRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
         
