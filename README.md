@@ -7,7 +7,6 @@ Sistema completo de gerenciamento de projetos e tarefas desenvolvido com **Sprin
 - [Tecnologias](#-tecnologias)
 - [Instalação](#-instalação)
 - [Rodando o Projeto](#-rodando-o-projeto)
-- [Endpoints da API](#-endpoints-da-api)
 - [CI/CD](#-cicd)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
 
@@ -62,7 +61,7 @@ docker-compose down
 # docker-compose up postgres -d
 
 # 1. Rodar a aplicação
-mvnw clear compile
+mvnw clean compile
 
 # 2. Rodar a aplicação
 mvnw spring-boot:run
@@ -105,120 +104,6 @@ Content-Type: application/json
   "email": "joao@email.com",
   "senha": "123456"
 }
-```
-
----
-
-### **📁 Projetos**
-
-> ⚠️ **Todos os endpoints abaixo requerem autenticação!**  
-> Header: `Authorization: Bearer {seu-token-jwt}`
-
-#### Criar Projeto
-```http
-POST /api/projetos
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "nome": "Sistema de Gestão",
-  "descricao": "Sistema completo de gestão de Gestão",
-  "status": "ATIVO",
-  "orcamentoDisponivel": 50000.00
-}
-```
-
-#### Listar Projetos
-```http
-GET /api/projetos
-Authorization: Bearer {token}
-
-# Com filtros (opcionais)
-GET /api/projetos?status=ATIVO
-GET /api/projetos?nome=Sistema
-```
-
-#### Buscar Projeto por ID
-```http
-GET /api/projetos/1
-Authorization: Bearer {token}
-```
-
-#### Atualizar Projeto
-```http
-PUT /api/projetos/1
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "nome": "Sistema de Gestão v2",
-  "descricao": "Sistema atualizado",
-  "status": "ATIVO",
-  "orcamentoDisponivel": 75000.00
-}
-```
-
-#### Deletar Projeto
-```http
-DELETE /api/projetos/1
-Authorization: Bearer {token}
-```
-
----
-
-### **✅ Tarefas**
-
-#### Criar Tarefa
-```http
-POST /api/tarefas
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "descricao": "Implementar login",
-  "projetoId": 1,
-  "dataInicio": "2024-01-15",
-  "dataFim": "2024-01-20",
-  "tarefaPredecessoraId": null,
-  "status": "NAO_CONCLUIDA"
-}
-```
-
-#### Listar Tarefas de um Projeto
-```http
-GET /api/tarefas?projetoId=1
-Authorization: Bearer {token}
-
-# Com filtros (opcionais)
-GET /api/tarefas?projetoId=1&status=CONCLUIDA
-GET /api/tarefas?projetoId=1&descricao=login
-```
-
-#### Buscar Tarefa por ID
-```http
-GET /api/tarefas/1
-Authorization: Bearer {token}
-```
-
-#### Atualizar Tarefa
-```http
-PUT /api/tarefas/1
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "descricao": "Implementar login com JWT",
-  "projetoId": 1,
-  "dataInicio": "2024-01-15",
-  "dataFim": "2024-01-22",
-  "status": "CONCLUIDA"
-}
-```
-
-#### Deletar Tarefa
-```http
-DELETE /api/tarefas/1
-Authorization: Bearer {token}
 ```
 
 ---
